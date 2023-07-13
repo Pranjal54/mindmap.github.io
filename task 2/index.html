@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mind Map Web App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ysabeau+Infant:wght@1000&display=swap" rel="stylesheet">
+    <style>
+
+        body{
+            background-image: url(./assets/images.png);
+            background-repeat: no-repeat;
+            background-size: cover;
+            font-family: 'Ysabeau Infant', sans-serif;
+        }
+        #mindmap-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            transition: transform 0.5s ease;
+            transform-origin: top left;
+            padding-top: 0px;
+            padding-bottom: 20px;
+            transition: 1s;
+        }
+
+        .node {
+        position: absolute;
+        background-color: #fff;
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+        padding: 10px;
+        
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, .3);
+         }
+
+        .line {
+        position: absolute;
+        border: 2px solid #000;
+        }
+
+        .subnode {
+        position: absolute;
+        background-color: #fff;
+        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+        padding: 10px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, .3);
+        }
+
+        .completed {
+        background-color: #a3ffa3 !important;
+        border: 2px solid #a3ffa3;
+        }
+
+        
+
+        h1{
+          text-align: center;
+          font-size: 50px;
+          font-weight: bolder;
+          margin-top: -10px;
+        }
+
+        button{
+            background-color: black;
+            color: white;
+            border-radius: 5px;
+            border: 2px solid black;
+            height: fit-content;
+            width: 150px;
+            line-height: 20px;
+            padding: 5px;
+        }
+
+        .button1:hover{
+            cursor: pointer;
+            border-radius: 5px;
+            border: 2px solid black;
+            height: fit-content;
+            width: 155px;
+            line-height: 25px;
+            font-size: 15px;
+            transition: 0.5s;
+            font-weight: 700;
+        }
+        .button2:hover{
+            cursor: pointer;
+            border-radius: 5px;
+            border: 2px solid black;
+            height: fit-content;
+            width: 155px;
+            line-height: 25px;
+            font-size: 15px;
+            transition: 0.5s;
+            font-weight: 700;
+        }
+        
+        .button3:hover{
+            cursor: pointer;
+            border-radius: 5px;
+            border: 2px solid black;
+            height: fit-content;
+            width: 155px;
+            line-height: 25px;
+            font-size: 15px;
+            transition: 0.5s;
+            font-weight: 700;
+        }
+        
+        .button4:hover{
+            cursor: pointer;
+            border-radius: 5px;
+            border: 2px solid black;
+            height: fit-content;
+            width: 155px;
+            line-height: 25px;
+            font-size: 15px;
+            transition: 0.5s;
+            font-weight: 700;
+        }
+        
+        .button5:hover{
+            cursor: pointer;
+            border-radius: 5px;
+            border: 2px solid black;
+            height: fit-content;
+            width: 155px;
+            line-height: 25px;
+            font-size: 15px;
+            transition: 0.5s;
+            font-weight: 700;
+        }
+
+        @media (max-width: 600px) {
+            #mindmap-container {
+                padding-top: 200px;
+                padding-bottom: 50px;
+                transition: 1s;
+            }
+
+            .node {
+                width: 80px;
+                height: 80px;
+                font-size: 14px;
+                
+            }
+
+            .subnode {
+                width: 60px;
+                height: 60px;
+                font-size: 12px;
+            }
+        }
+        
+</style>
+
+</head>
+
+<body>
+    <h1>Mind Map Web App</h1>
+    <div id="mindmap-container">
+        <div class="node" style="top: 100px; left: 50px;" id="task1" draggable="true" ondragstart="drag(event)"
+            ondragover="allowDrop(event)" ondrop="drop(event)" onclick="editNode(event)">Task 1</div>
+        <div class="line" id="line1"></div>
+    </div>
+
+    <script>
+      const nodes = document.querySelectorAll('.node');
+      const lines = document.querySelectorAll('.line');
+      const subnodes = document.querySelectorAll('.subnode');
+      let selectedNode = null;
+      let zoomLevel = 1;
+  
+      function createLine() {
+          const line = document.createElement('div');
+          line.className = 'line';
+          line.id = `line${lines.length + 1}`;
+          document.getElementById('mindmap-container').appendChild(line);
+          return line;
+      }
+  
+      function allowDrop(event) {
+          event.preventDefault();
+      }
+  
+      function drag(event) {
+          selectedNode = event.target;
+          event.dataTransfer.setData('text', event.target.id);
+      }
+  
+      function drop(event) {
+          event.preventDefault();
+  
+          const nodeId = event.dataTransfer.getData('text');
+          const line = createLine();
+          line.style.top = `${event.clientY}px`;
+          line.style.left = `${event.clientX}px`;
+          const targetNode = event.target.closest('.node');
+          const targetRect = targetNode.getBoundingClientRect();
+          const offsetX = event.clientX - targetRect.left;
+          const offsetY = event.clientY - targetRect.top;
+          let connectedTo = targetNode.dataset.connectedTo || '';
+          connectedTo += `${line.id},`;
+          targetNode.dataset.connectedTo = connectedTo;
+          line.dataset.originNode = targetNode.id;
+          selectedNode.style.top = `${event.clientY - offsetY}px`;
+          selectedNode.style.left = `${event.clientX - offsetX}px`;
+          line.dataset.destinationNode = selectedNode.id;
+  
+          // Adding subnode
+          const subnode = document.createElement('div');
+          subnode.className = 'subnode';
+          subnode.style.top = `${event.clientY}px`;
+          subnode.style.left = `${event.clientX}px`;
+          subnode.draggable = true;
+          subnode.ondragstart = drag;
+          subnode.ondragover = allowDrop;
+          subnode.ondrop = drop;
+          subnode.onclick = editNode;
+          subnode.textContent = `Subtask ${subnodes.length + 1}`;
+          document.getElementById('mindmap-container').appendChild(subnode);
+  
+          // Connect subnode to parent task
+          const subline = createLine();
+          let parentLine = null;
+  
+          lines.forEach(line => {
+              if (line.dataset.destinationNode === targetNode.id) {
+                  parentLine = line;
+              }
+          });
+  
+          if (parentLine) {
+              const parentRect = targetNode.getBoundingClientRect();
+              const parentCenterX = parentRect.left + parentRect.width / 2;
+              const parentCenterY = parentRect.top + parentRect.height / 2;
+              const subnodeRect = subnode.getBoundingClientRect();
+              const subnodeCenterX = subnodeRect.left + subnodeRect.width / 2;
+              const subnodeCenterY = subnodeRect.top + subnodeRect.height / 2;
+              const dx = subnodeCenterX - parentCenterX;
+              const dy = subnodeCenterY - parentCenterY;
+              const angle = Math.atan2(dy, dx);
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              subline.style.width = `${distance}px`;
+              subline.style.transform = `translate(${parentCenterX}px, ${parentCenterY}px) rotate(${angle}rad)`;
+              subline.dataset.originNode = targetNode.id;
+              subline.dataset.destinationNode = subnode.id;
+          }
+  
+          updateLines();
+      }
+  
+      function updateLines() {
+          lines.forEach(line => {
+              const originNodeId = line.dataset.originNode;
+              const destinationNodeId = line.dataset.destinationNode;
+              if (originNodeId && destinationNodeId) {
+                  const originNode = document.getElementById(originNodeId);
+                  const destinationNode = document.getElementById(destinationNodeId);
+                  const originRect = originNode.getBoundingClientRect();
+                  const destinationRect = destinationNode.getBoundingClientRect();
+                  const originCenterX = originRect.left + originRect.width / 2;
+                  const originCenterY = originRect.top + originRect.height / 2;
+                  const destinationCenterX = destinationRect.left + destinationRect.width / 2;
+                  const destinationCenterY = destinationRect.top + destinationRect.height / 2;
+                  const dx = destinationCenterX - originCenterX;
+                  const dy = destinationCenterY - originCenterY;
+                  const angle = Math.atan2(dy, dx);
+                  const distance = Math.sqrt(dx * dx + dy * dy);
+                  line.style.width = `${distance}px`;
+                  line.style.transform = `translate(${originCenterX}px, ${originCenterY}px) rotate(${angle}rad)`;
+              }
+          });
+      }
+  
+      document.addEventListener('mousemove', (event) => {
+          if (selectedNode !== null) {
+              selectedNode.style.top = `${event.clientY}px`;
+              selectedNode.style.left = `${event.clientX}px`;
+              updateLines();
+          }
+      });
+  
+      function addNode() {
+          const node = document.createElement('div');
+          node.className = 'node';
+          node.style.top = `${Math.floor(Math.random() * (window.innerHeight - 100))}px`;
+          node.style.left = `${Math.floor(Math.random() * (window.innerWidth - 100))}px`;
+          node.draggable = true;
+          node.ondragstart = drag;
+          node.ondragover = allowDrop;
+          node.ondrop = drop;
+          node.onclick = editNode;
+          node.textContent = `Task ${nodes.length + 1}`;
+          document.getElementById('mindmap-container').appendChild(node);
+      }
+  
+      function zoomIn() {
+          zoomLevel += 0.1;
+          document.getElementById('mindmap-container').style.transform = `scale(${zoomLevel})`;
+          updateLines();
+          
+          
+      }
+  
+      function zoomOut() {
+          if (zoomLevel > 0.1) {
+              zoomLevel -= 0.1;
+              document.getElementById('mindmap-container').style.transform = `scale(${zoomLevel})`;
+              updateLines();
+          }
+      }
+  
+      function editNode(event) {
+          const node = event.target;
+          const title = prompt("Enter task title:", node.textContent);
+          if (title) {
+              node.textContent = title;
+          }
+      }
+  
+      function markTaskStatus(event) {
+          const node = event.target;
+          const status = prompt("Enter task status:", "completed/in progress/pending");
+          if (status) {
+              node.classList.remove("completed", "in-progress", "pending");
+              node.classList.add(status.toLowerCase());
+          }
+      }
+
+      function exportMindMap() {
+            // 1. Export the mind map data in a suitable format (e.g., JSON)
+            const mindMapData = {
+                nodes: [],
+                lines: []
+            };
+
+            nodes.forEach(node => {
+                const nodeData = {
+                    id: node.id,
+                    top: node.style.top,
+                    left: node.style.left,
+                    text: node.textContent
+                };
+                mindMapData.nodes.push(nodeData);
+            });
+
+            lines.forEach(line => {
+                const lineData = {
+                    id: line.id,
+                    originNode: line.dataset.originNode,
+                    destinationNode: line.dataset.destinationNode
+                };
+                mindMapData.lines.push(lineData);
+            });
+
+            // 2. Send the mind map data to other task management tools or export it in popular formats
+            // Implement the logic here to integrate with other tools or perform the export
+
+            // Example: Export as a JSON file
+            const mindMapJSON = JSON.stringify(mindMapData);
+            const blob = new Blob([mindMapJSON], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mindmap.json';
+            a.click();
+        }
+    </script>
+
+    <button class="button1" onclick="addNode()">Add Node</button>
+    <button class="button2" onclick="zoomIn()">Zoom In</button>
+    <button  class="button3" onclick="zoomOut()">Zoom Out</button>
+    <button class="button4" onclick="markTaskStatus(event)">Mark Task Status</button>
+    <button class="button5" onclick="exportMindMap()">Export Mind Map</button>
+
+  
+  
+</body>
+
+</html>  
+
+
+
